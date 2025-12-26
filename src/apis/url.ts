@@ -46,18 +46,23 @@ router.get("/:shortCode", async(req: Request, res: Response, next: NextFunction)
 
         // return res.status(200).json({message: "Succes", shortURL});
     } catch (err) {
-        const error = new CreateError("Somthing went wrong!");
+        const error = new FetchError("Somthing went wrong while fetching data!");
         return next(error);
     }    
 });
 
-router.get("/details/:shortCode", async (req: Request, res: Response)=>{
-    const url = await getByShortCode(req.params.shortCode)
-    if (!url) return res.status(404).json({ message: "Not found" });
+router.get("/details/:shortCode", async (req: Request, res: Response, next: NextFunction)=>{
+    try {
+        const url = await getByShortCode(req.params.shortCode)
+        if (!url) return res.status(404).json({ message: "Not found" });
 
-    return res.status(200).json({
-        details: url
-    });
+        return res.status(200).json({
+            details: url
+        });
+    } catch (err) {
+        const error = new FetchError("Somthing went wrong while fetching data!");
+        return next(error);
+    }
 });
 
 router.use((err:any, req:Request, res:Response, next:NextFunction)=>{
