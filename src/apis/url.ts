@@ -18,7 +18,7 @@ router.post("/create/sc", async (req: Request, res: Response, next: NextFunction
         const urlObj = await prisma.url.create({
             data: {
                 original_url: url,
-                short_code: nanoid(10)
+                short_code: nanoid(10)+".com"
             }
         });
 
@@ -32,10 +32,10 @@ router.post("/create/sc", async (req: Request, res: Response, next: NextFunction
 router.get("/:shortCode", async(req: Request, res: Response, next: NextFunction)=>{
     try {
         const url = await getByShortCode(req.params.shortCode)
-        if (!url) return res.status(404).json({ message: "Not found" });
+        // if (!url) return res.status(404).json({ message: "Not found" });
 
 
-        if (url==null) {
+        if (!url) {
             const err = new FetchError("Shortcode not found!");
             return next(err);
         }
@@ -66,7 +66,7 @@ router.get("/details/:shortCode", async (req: Request, res: Response, next: Next
 });
 
 router.use((err:any, req:Request, res:Response, next:NextFunction)=>{
-   return res.status(err.status || 500).json({ErrorMessage: err.message});
+   return res.status(err.status || 500).json({ErrorMessage: err.message, errorCode: err.code});
 });
 
 export default router;
